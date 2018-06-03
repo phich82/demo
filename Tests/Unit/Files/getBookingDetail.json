@@ -1,0 +1,141 @@
+{
+    "common": {
+        "status_code": 200,
+        "language_code": "JP"
+    },
+    "booking_id": "VELTRA-5YJOYFNT",
+    "booking_status": "REQUESTED",
+    "activity_id": "VELTRA-100010679",
+    "activity_title": "scenario22-single package voucher-JP",
+    "plan_id": "VELTRA-108951-0",
+    "target_date": "2018-08-23",
+    "booked_date": "2018-04-08",
+    "plan_start_time_id": "VELTRA-108951-0-117059",
+    "plan_start_time": "08:00",
+    "plan_transportation_item": {
+        "id": "15180",
+        "title": "bus",
+        "count": 1
+    },
+    "plan_unit_items": [
+        {
+            "id": "146763",
+            "title": "大人子供共通 (5歳以上)",
+            "count": 2
+        }
+    ],
+    "participant_last_name": "Le",
+    "participant_first_name": "Danny",
+    "hotel_name": "NewWorld",
+    "hotel_address": "Pham Hong Thai, Quan 1, TPHCM",
+    "hotel_latitude": 456.456,
+    "hotel_longitude": 321.321,
+    "hotel_reservation_last_name": "Liv",
+    "hotel_reservation_first_name": "Lee",
+    "hotel_tel": "+84 9999999",
+    "per_booking_fields": [
+        {
+            "booking_fields_id": "31566",
+            "response": [
+                "sea"
+            ]
+        }
+    ],
+    "local_contact_normal": {
+        "supplier": "SHIFT ASIA",
+        "tel_number": "+84 12345678",
+        "available_times": [
+            {
+                "day": "MON",
+                "hours": "08:00 - 17:00"
+            },
+            {
+                "day": "TUE",
+                "hours": "08:00 - 17:00"
+            },
+            {
+                "day": "WED",
+                "hours": "08:00 - 17:00"
+            },
+            {
+                "day": "THU",
+                "hours": "08:00 - 17:00"
+            },
+            {
+                "day": "FRI",
+                "hours": "08:00 - 17:00"
+            }
+        ]
+    },
+    "local_contact_emergency": {
+        "supplier": "SHIFT ASIA",
+        "tel_number": "+81 12345678",
+        "available_times": [
+            {
+                "day": "MON",
+                "hours": "09:00 - 18:00"
+            },
+            {
+                "day": "TUE",
+                "hours": "09:00 - 18:00"
+            },
+            {
+                "day": "WED",
+                "hours": "09:00 - 18:00"
+            },
+            {
+                "day": "THU",
+                "hours": "09:00 - 18:00"
+            },
+            {
+                "day": "FRI",
+                "hours": "09:00 - 18:00"
+            }
+        ]
+    },
+    "other_info_items": [
+        "ツアースケジュールは天候、交通状況等により変更、中止になる場合があります。",
+        "このアクティビティは英語でのご案内となります。"
+    ],
+    "plan_inclusion": [
+        "朝食",
+        "リュックサック"
+    ],
+    "plan_inclusion_details": [
+        {
+            "title": "朝食"
+        },
+        {
+            "title": "リュックサック"
+        }
+    ],
+    "activity_cancel_policies": [
+        {
+            "description": "3 days prior: 50% total charge / booking\r\n2 days prior: 70% total charge / booking\r\n1 days prior: 100% total charge / booking"
+        }
+    ],
+    "original_currency_code": "JPY",
+    "original_amount_gross": 2100,
+    "original_amount_net": 1995,
+    "original_amount_gross_discount": 0,
+    "original_amount_net_discount": 0,
+    "original_amount_gross_final": 2100,
+    "original_amount_net_final": 1995,
+    "display_currency_code": "JPY",
+    "display_amount_gross": 2100,
+    "display_amount_net": 1995,
+    "display_amount_gross_discount": 0,
+    "display_amount_net_discount": 0,
+    "display_amount_gross_final": 2100,
+    "display_amount_net_final": 1995,
+    "payment_currency_code": "JPY",
+    "payment_amount_gross": 2100,
+    "payment_amount_net": 1995,
+    "payment_amount_gross_discount": 0,
+    "payment_amount_net_discount": 0,
+    "payment_amount_gross_final": 2100,
+    "payment_amount_net_final": 1995,
+    "cancel_fee_status": "NOT_APPLICABLE",
+    "voucher_id": "1597808",
+    "confirmation_type": "DELAYED_CAN_REJECT"
+}

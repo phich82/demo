@@ -1,0 +1,267 @@
+{
+    "common": {
+        "language_code": "JP"
+    },
+    "id": "VELTRA-100010679",
+    "status": "ACTIVE",
+    "title": "scenario22-single package voucher-JP",
+    "image_urls": [
+        "https://s3-ap-northeast-1.amazonaws.com/dev-veltra-platform-changecapture-public-resource/activities/100010679/img/activities/1561454_4.jpg",
+        "https://s3-ap-northeast-1.amazonaws.com/dev-veltra-platform-changecapture-public-resource/activities/100010679/img/activities/1561455_4.jpg"
+    ],
+    "description": "Scenario testing data 22\r\nScenario testing data 22\r\nScenario testing data 22\r\nScenario testing data 22\r\n\n",
+    "area": {
+        "title": "東京",
+        "path": "asia/japan/tokyo/"
+    },
+    "available_days": [
+        "SUN",
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT"
+    ],
+    "closed_dates": [
+        "2018-01-31",
+        "2018-02-14",
+        "2019-02-14",
+        "2020-02-14",
+        "2021-02-14",
+        "2022-02-14",
+        "2023-02-14",
+        "2024-02-14",
+        "2025-02-14",
+        "2026-02-14",
+        "2027-02-14",
+        "2028-02-14",
+        "2029-02-14",
+        "2030-02-14",
+        "2031-02-14",
+        "2032-02-14",
+        "2033-02-14",
+        "2034-02-14",
+        "2035-02-14",
+        "2036-02-14",
+        "2037-02-14"
+    ],
+    "original_amount": 1000,
+    "display_amount": 1000,
+    "supplier_name": "SHIFT ASIA",
+    "other_info_items": [
+        {
+            "description": "ツアースケジュールは天候、交通状況等により変更、中止になる場合があります。",
+            "plan_ids": [
+                "VELTRA-108951-0"
+            ]
+        },
+        {
+            "description": "このアクティビティは英語でのご案内となります。",
+            "plan_ids": [
+                "VELTRA-108951-0"
+            ]
+        }
+    ],
+    "required_unit_items": [
+        {
+            "max_amount": 8,
+            "plan_ids": [
+                "VELTRA-108951-0"
+            ]
+        }
+    ],
+    "cancel_policies": [
+        {
+            "description": "3 days prior: 50% total charge / booking\r\n2 days prior: 70% total charge / booking\r\n1 days prior: 100% total charge / booking"
+        }
+    ],
+    "booking_fields": [
+        {
+            "id": "31564",
+            "method": "PER_PARTICIPANT",
+            "type": "REQUIRED_BY_ACTIVITY_DATE",
+            "format": "YES_OR_NO",
+            "title": "ベジタリアンフード希望",
+            "choices": [
+                "あり",
+                "なし"
+            ],
+            "plan_ids": [
+                "VELTRA-108951-0"
+            ]
+        },
+        {
+            "id": "31565",
+            "method": "PER_PARTICIPANT",
+            "type": "OPTIONAL",
+            "format": "TEXT",
+            "title": "食物アレルギー",
+            "plan_ids": [
+                "VELTRA-108951-0"
+            ]
+        },
+        {
+            "id": "31566",
+            "method": "PER_BOOKING",
+            "type": "REQUIRED_ON_BOOKING",
+            "format": "TEXT",
+            "title": "ご希望の観光スポット",
+            "plan_ids": [
+                "VELTRA-108951-0"
+            ]
+        }
+    ],
+    "plans": [
+        {
+            "id": "VELTRA-108951-0",
+            "code": "101",
+            "confirmation_type": "INSTANT_CAN_REJECT",
+            "available_days": [
+                "SUN",
+                "MON",
+                "TUE",
+                "WED",
+                "THU",
+                "FRI",
+                "SAT"
+            ],
+            "closed_dates": [
+                "2018-01-31",
+                "2018-02-14",
+                "2019-02-14",
+                "2020-02-14",
+                "2021-02-14",
+                "2022-02-14",
+                "2023-02-14",
+                "2024-02-14",
+                "2025-02-14",
+                "2026-02-14",
+                "2027-02-14",
+                "2028-02-14",
+                "2029-02-14",
+                "2030-02-14",
+                "2031-02-14",
+                "2032-02-14",
+                "2033-02-14",
+                "2034-02-14",
+                "2035-02-14",
+                "2036-02-14",
+                "2037-02-14"
+            ],
+            "inclusion": [
+                "朝食",
+                "リュックサック"
+            ],
+            "start_type": "CHECKIN_AND_PICKUP",
+            "end_type": "CHECKOUT_ONLY",
+            "start_times": [
+                {
+                    "id": "VELTRA-108951-0-117059",
+                    "time": "08:00:00"
+                }
+            ],
+            "schedules": [
+                {
+                    "time": "-60",
+                    "end_time": "0",
+                    "title": "Pick-up & Check-in",
+                    "day": "1日目"
+                },
+                {
+                    "title": "visit",
+                    "day": "1日目"
+                },
+                {
+                    "title": "Check-out",
+                    "day": "1日目"
+                }
+            ],
+            "checkin_points": [
+                {
+                    "time": "0",
+                    "name": "株式会社スタジオアルタ 日本",
+                    "latitude": 35.692627,
+                    "longitude": 139.7013
+                }
+            ],
+            "pickup_points": [
+                {
+                    "time": "-60",
+                    "name": "新宿区5丁目"
+                }
+            ],
+            "checkout_points": [
+                {
+                    "name": "株式会社スタジオアルタ 日本",
+                    "latitude": 35.692627,
+                    "longitude": 139.7013
+                }
+            ],
+            "transportation_items": [
+                {
+                    "id": "15180",
+                    "title": "bus",
+                    "pricing_method": "PER_GROUP",
+                    "original_amount": 100,
+                    "display_amount": 100
+                }
+            ],
+            "options": [
+                {
+                    "id": "91230",
+                    "title": "Add-ons",
+                    "pricing_method": "PER_PARTICIPANT",
+                    "original_amount": 1000,
+                    "display_amount": 1000
+                }
+            ],
+            "price_information_items": [
+                {
+                    "start_date": "2017-10-05",
+                    "end_date": "2038-01-01",
+                    "available_days": [
+                        "SUN",
+                        "MON",
+                        "TUE",
+                        "WED",
+                        "THU",
+                        "FRI",
+                        "SAT"
+                    ],
+                    "unit_items": [
+                        {
+                            "id": "146763",
+                            "name": "大人子供共通 (5歳以上)",
+                            "original_amount": 1000,
+                            "display_amount": 1000,
+                            "criteria": "STANDALONE_AND_COUNTABLE"
+                        }
+                    ]
+                }
+            ],
+            "deadlines": [
+                {
+                    "days_before": 2,
+                    "close_time": "16:00"
+                },
+                {
+                    "close_time": "23:30"
+                }
+            ],
+            "hotel_info_deadline": "REQUIRED_BY_ACTIVITY_DATE",
+            "inclusion_details": [
+                {
+                    "title": "朝食"
+                },
+                {
+                    "title": "リュックサック"
+                }
+            ]
+        }
+    ],
+    "original_currency_code": "JPY",
+    "display_currency_code": "JPY",
+    "display_currency_rate": 1,
+    "timestamp": "2018-02-22T06:10:54.039681489Z"
+}
