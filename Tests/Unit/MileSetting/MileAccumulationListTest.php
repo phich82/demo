@@ -1,6 +1,6 @@
 <?php
 /**
- * Screen: ANA_MileSetting_Redemption_ListScreen
+ * Screen: ANA_MileSetting_Accumulation_ListScreen
  * @author Phat Huynh Nguyen <huynh.phat@mulodo.com>
  */
 namespace Tests\Unit\MileSetting;
@@ -51,6 +51,13 @@ class MileAccumulationListTest extends TestCase
         self::$url = route('admin.mile.index');
         $this->mileRepo = new MileRepository();
         $this->promotionRepo = new PromoRepository();
+        if ($this->bookingDetail === null) {
+            $this->mockApi();
+            Mile::query()->delete();
+            Promotion::query()->delete();
+        }
+        $this->prepareData();
+        $this->startSession();
     }
 
     /**
@@ -117,8 +124,10 @@ class MileAccumulationListTest extends TestCase
     {
         $this->checkLogin();
 
+        Mile::query()->delete();
+
         $this->get(self::$url)
-             ->assertSee('編集');
+             ->assertViewHas('currentSetting', null);
     }
 
     /**
@@ -134,7 +143,13 @@ class MileAccumulationListTest extends TestCase
      */
     public function test142NoDisplayMileCurrentBasicSettingWhenReturnedDataEmpty()
     {
-        $this->markTestIncomplete('Mark skip test to find solution');
+        $this->login();
+
+        // create a mile current basic setting with type as redemption
+        $this->createBasicSetting(['plan_start_date' => date('Y-m-d'), 'mile_type' => \Constant::MILE_REDEMPTION]);
+
+        $this->get(self::$url)
+             ->assertViewHas('currentSetting', null);
     }
 
     /**
@@ -153,11 +168,17 @@ class MileAccumulationListTest extends TestCase
     {
         $this->checkLogin();
 
-        $this->createBasicSettings(10, '2018-01-05', 200);
+        $this->createBasicSettings([
+            ['plan_start_date' => date('Y-m-d', strtotime(date('Y-m-d')) - 2*24*60*60), 'amount' => 50],
+            ['plan_start_date' => date('Y-m-d'), 'amount' => 100],
+            ['plan_start_date' => date('Y-m-d', strtotime(date('Y-m-d')) + 2*24*60*60), 'amount' => 150],
+            ['plan_start_date' => date('Y-m-d', strtotime(date('Y-m-d')) + 4*24*60*60), 'amount' => 200],
+        ]);
 
         $currentSetting = $this->mileRepo->getCurrentSetting(self::$mileType);
 
         $this->assertEquals(1, count($currentSetting));
+
         $this->get(self::$url)
              ->assertSee((string)$currentSetting->amount)
              ->assertSee($currentSetting->plan_start_date);
@@ -171,11 +192,16 @@ class MileAccumulationListTest extends TestCase
      * - Database empty
      *
      * Expectation:
-     * - Do not see: 'より'
+     * - Do not see any the mile scheduled basic settings on screen
      */
     public function test161NoDisplayMileScheduleBasicSettingWhenDatabaseEmpty()
     {
-        $this->markTestIncomplete('Mark skip test to find solution');
+        $this->login();
+
+        Mile::query()->delete();
+
+        $this->get(self::$url)
+             ->assertViewHas('scheduledSetting', null);
     }
 
     /**
@@ -195,23 +221,13 @@ class MileAccumulationListTest extends TestCase
 
         Mile::query()->delete();
 
-        $planStartDate = '2019-01-01';
-        factory(Mile::class)->create([
-            'plan_start_date' => '2018-01-01',
-            'amount' => 150,
-            'mile_type' => \Constant::MILE_ACCUMULATION,
-        ]);
-        factory(Mile::class)->create([
-            'plan_start_date' => strtotime($planStartDate) <= time() ? date('Y-m-d', time() + 1*24*60*60) : $planStartDate,
-            'amount' => 200,
-            'mile_type' => \Constant::MILE_REDEMPTION,
-        ]);
+        $this->createBasicSetting(['plan_start_date' => date('Y-m-d'), 'amount' => 150]);
 
         $scheduleSetting = $this->mileRepo->getScheduleSetting(self::$mileType);
         
         $this->assertEquals(null, $scheduleSetting);
         $this->get(self::$url)
-             ->assertDontSee('より');
+             ->assertViewHas('scheduleSetting', null);
     }
 
     /**
@@ -228,9 +244,13 @@ class MileAccumulationListTest extends TestCase
      */
     public function test17DisplayMileScheduleBasicSetting()
     {
-        $this->checkLogin();
+        $this->login();
 
-        $this->createBasicSettings(20, '2020-01-01', 150);
+        $this->createBasicSettings([
+            ['plan_start_date' => date('Y-m-d'), 'amount' => 100],
+            ['plan_start_date' => date('Y-m-d', \strtotime(date('Y-m-d')) + 3*24*60*60), 'amount' => 150],
+            ['plan_start_date' => date('Y-m-d', \strtotime(date('Y-m-d')) + 5*24*60*60), 'amount' => 200],
+        ]);
 
         $scheduleSetting = $this->mileRepo->getScheduleSetting(self::$mileType);
         
@@ -253,10 +273,13 @@ class MileAccumulationListTest extends TestCase
     public function test18NoDisplayLinkEditScheduleSettingWhenLoginAsOperator()
     {
         // login as operator
-        $this->checkLogin(false);
+        $this->login('operator');
 
-        // create 5 records randomly
-        $this->createBasicSettings(5, '2020-01-01', 150);
+        $this->createBasicSettings([
+            ['plan_start_date' => date('Y-m-d'), 'amount' => 100],
+            ['plan_start_date' => date('Y-m-d', \strtotime(date('Y-m-d')) + 3*24*60*60), 'amount' => 150],
+            ['plan_start_date' => date('Y-m-d', \strtotime(date('Y-m-d')) + 5*24*60*60), 'amount' => 200],
+        ]);
 
         $scheduleSetting = $this->mileRepo->getScheduleSetting(self::$mileType);
 
@@ -277,17 +300,21 @@ class MileAccumulationListTest extends TestCase
      */
     public function test19DisplayLinkEditScheduleSettingWhenLoginAsAdmin()
     {
-        $this->checkLogin();
+        $this->login('admin');
 
         // create 5 records randomly
-        $this->createBasicSettings(5, '2020-01-01', 150);
+        $this->createBasicSettings([
+            ['plan_start_date' => date('Y-m-d'), 'amount' => 100],
+            ['plan_start_date' => date('Y-m-d', \strtotime(date('Y-m-d')) + 3*24*60*60), 'amount' => 150],
+            ['plan_start_date' => date('Y-m-d', \strtotime(date('Y-m-d')) + 5*24*60*60), 'amount' => 200],
+        ]);
 
         $scheduleSetting = $this->mileRepo->getScheduleSetting(self::$mileType);
-        $linkEdit = route('admin.mile.basic');
 
         $this->assertEquals(1, count($scheduleSetting));
         $this->get(self::$url)
-             ->assertSee($linkEdit);
+             ->assertSee('編集')
+             ->assertSee(route('admin.mile.basic', $scheduleSetting->id));
     }
 
     /**
@@ -387,9 +414,9 @@ class MileAccumulationListTest extends TestCase
      * Expectation:
      * - See text: '新規プロモーションを作成'
      */
-    public function test115DisplayALinkCreateNewPromotionWhenLoginAsAdmin()
+    public function test115DisplayLinkCreateNewPromotionWhenLoginAsAdmin()
     {
-        $this->checkLogin();
+        $this->login('admin');
 
         $this->get(self::$url)
              ->assertSee('新規プロモーションを作成');
@@ -405,9 +432,9 @@ class MileAccumulationListTest extends TestCase
      * Expectation:
      * - Do not see text: '新規プロモーションを作成'
      */
-    public function test116NoDisplayALinkCreateNewPromotionWhenLoginAsOperator()
+    public function test116NoDisplayLinkCreateNewPromotionWhenLoginAsOperator()
     {
-        $this->checkLogin(false);
+        $this->login('operator');
 
         $this->get(self::$url)
              ->assertDontSee('新規プロモーションを作成');
@@ -854,7 +881,7 @@ class MileAccumulationListTest extends TestCase
     }
 
     /**
-     * [TestCase-1.33] Test display the sumary result at bottom-right screen
+     * [TestCase-1.33] Test display the summary result at bottom-right screen
      *
      * Condition:
      * - Authenticate a user
@@ -867,13 +894,13 @@ class MileAccumulationListTest extends TestCase
      * - See: '50 件中 1-20 を表示'
      * - (Do not see '0 件中 1-1 を表示')
      */
-    public function test133DisplaySumaryResultWhenLoadScreen()
+    public function test133DisplaySummaryResultWhenLoadScreen()
     {
         $this->markTestIncomplete('Mark skip test to find solution');
     }
 
     /**
-     * [TestCase-1.34] Test display the sumary result at bottom-right screen when changing the filter action
+     * [TestCase-1.34] Test display the summary result at bottom-right screen when changing the filter action
      *
      * Condition:
      * - Authenticate a user
@@ -886,7 +913,7 @@ class MileAccumulationListTest extends TestCase
      * Expectation:
      * - See: '50 件中 1-20 を表示'
      */
-    public function test134DisplaySumaryResultWhenChangeFilterAction()
+    public function test134DisplaySummaryResultWhenChangeFilterAction()
     {
         $this->markTestIncomplete('Mark skip test to find solution');
     }
@@ -926,166 +953,99 @@ class MileAccumulationListTest extends TestCase
     /**
      * authenticate a given user as the current user
      *
-     * default: login as admin
+     * default: login as operator
      *
-     * @param object $user
+     * @param string $role
      * @return void
      */
-    private function checkLogin($isAdmin = true)
+    private function login($role = 'operator')
     {
-        $this->actingAs($isAdmin ? $this->createAdmin() : $this->createOperator());
+        $this->actingAs($role == 'admin' ? $this->createAdmin() : $this->createOperator());
     }
 
     /**
-     * create promotions from params in database
+     * create the mile basic settings
      *
-     * @param array $activityIDs
-     * @param integer $totalRecords
+     * @param array $data
      * @return void
      */
-    private function createPromotions($activityIDs = [], $totalRecords = 3)
-    {
-        Promotion::query()->delete();
-
-        $count = 1;
-        $y = 2018;
-        $m = 5;
-        $total = is_int($activityIDs) ? $activityIDs : $totalRecords;
-        $ids = ['VELTRA-10474', 'VELTRA-10484', 'VELTRA-154165'];
-        $defData = [
-            'VELTRA-10474'  => [
-                'title'     => 'バトー・ロンドン(Bateaux London)☆お得に一流サービスを！テムズ川ランチクルーズ',
-                'mile_type' => \Constant::MILE_ACCUMULATION,
-                'area_path' => 'europe/spain/cordoba/',
-            ],
-            'VELTRA-10484'  => [
-                'title' => 'ロンドン自転車ツアー　3つのコースから選べる！＜英語＞ ',
-                'mile_type' => \Constant::MILE_ACCUMULATION,
-                'area_path' => 'europe/spain/cordoba/',
-            ],
-            'VELTRA-154165' => [
-                'title' => 'ロンドン・エクスプローラーパス（London Explorer Pass®）人気ツアー＆観光スポット入場カード',
-                'mile_type' => \Constant::MILE_ACCUMULATION,
-                'area_path' => 'europe/uk/london/',
-            ],
-        ];
-        $defUnit = [\Constant::UNIT_ACTIVITY, \Constant::UNIT_AREA];
-        $defRateType = [\Constant::ACCUMULATION_RATE_TYPE_VARIABLE, \Constant::ACCUMULATION_RATE_TYPE_FIXED];
-
-        $data = is_array($activityIDs) && !empty($activityIDs) ? $activityIDs : $defData;
-        
-        $idsRandom = ['VELTRA-10474', 'VELTRA-10484', 'VELTRA-154165'];
-        if ($total == 1) {
-            $ids = ['VELTRA-10474'];
-        } elseif ($total == 2) {
-            $ids = ['VELTRA-10474', 'VELTRA-10484'];
-        } elseif ($total > 3) {
-            $len = $total - 3;
-            for ($i = 0; $i < $len; $i++) {
-                $ids[] = $idsRandom[array_rand($idsRandom)];
-            }
-        }
-
-        foreach ($ids as $k => $id) {
-            if ($count > 28) {
-                $count = 1;
-                if ($m >= 12) {
-                    $m = 1;
-                    $y++;
-                } else {
-                    $m++;
-                }
-            }
-
-            $dASD = $count < 10 && $count <= 30 ? '0'.$count       : $count;
-            $dPSD = $count < 8  && $count <= 25 ? '0'.($count + 2) : ($count + 2);
-            
-            $asd = $y.'-'.($m < 10 ? '0'.$m : ($m > 12 ? 12 : $m)).'-'.$dASD;
-            $psd = $y.'-'.($m < 10 ? '0'.$m : ($m > 12 ? 12 : $m)).'-'.$dPSD;
-
-            factory(Promotion::class)->create([
-                'activity_id' => $id,
-                'activity_title' => $data[$id]['title'],
-                'area_path' => $data[$id]['area_path'],
-                'unit' => $defUnit[array_rand($defUnit)],
-                'amount' => 150 + ($k + 1),
-                'activity_start_date' => isset($data[$id]['asd']) ? $data[$id]['asd'] : $asd,
-                'activity_end_date' => isset($data[$id]['aed']) ? $data[$id]['aed'] : null,
-                'purchase_start_date' => isset($data[$id]['psd']) ? $data[$id]['psd'] : $psd,
-                'purchase_end_date' => isset($data[$id]['ped']) ? $data[$id]['ped'] : null,
-                'mile_type' => $data[$id]['mile_type'],
-                'rate_type' => $defRateType[array_rand($defRateType)],
-                'created_user' => 'admin@gmail.com',
-            ]);
-            $count++;
-            $m++;
-            $y++;
-        }
-    }
-
-    /**
-     * create the basic settings with the expected total of records
-     *
-     * @param integer $numRows
-     * @param string $defDate
-     * @param float $defAmount
-     * @return void
-     */
-    private function createBasicSettings($numRows = 1, $defDate = null, $defAmount = null)
+    private function createBasicSettings($params = [])
     {
         Mile::query()->delete();
 
-        if (!empty($defDate) && !empty($defAmount)) {
+        foreach ($params as $param) {
             factory(Mile::class)->create([
-                'plan_start_date' => $defDate,
-                'amount' => $defAmount,
-                'mile_type' => \Constant::MILE_ACCUMULATION,
+                'plan_start_date' => $param['plan_start_date'],
+                'amount'          => $param['amount'] ?? 100,
+                'mile_type'       => $param['mile_type'] ?? \Constant::MILE_ACCUMULATION
             ]);
-            $numRows = $numRows > 1 ? $numRows - 1 : 0;
-        }
-
-        $mileTypes = [\Constant::MILE_REDEMPTION, \Constant::MILE_ACCUMULATION];
-
-        $count = 1;
-        $y = 2018;
-        $m = 5;
-        for ($i = 0; $i < $numRows; $i++) {
-            if ($count > 28) {
-                $count = 1;
-                if ($m >= 12) {
-                    $m = 1;
-                    $y++;
-                } else {
-                    $m++;
-                }
-            }
-
-            $d = $count < 10 && $count <= 30 ? '0'.$count : $count;
-            $sDate = $y.'-'.($m < 10 ? '0'.$m : ($m > 12 ? 12 : $m)).'-'.$d;
-
-            factory(Mile::class)->create([
-                'plan_start_date' => $sDate,
-                'amount' => 150 + ($i + 1),
-                'mile_type' => $mileTypes[array_rand($mileTypes)]
-            ]);
-
-            $count++;
-            $m++;
-            $y++;
         }
     }
 
     /**
-     * get url by paramters
+     * Create new a basic setting
      *
      * @param array $params
-     * @return string
+     * @param boolean $return
+     * @return mixed
      */
-    private function getUrlByParams($params = [])
+    private function createBasicSetting($params = [], $return = false)
     {
-        if (is_array($params)) {
-            return route('admin.mile.index', $params);
+        Mile::query()->delete();
+
+        $basicSetting = factory(Mile::class)->create([
+            'plan_start_date' => $params['plan_start_date'] ?? date('Y-m-d'),
+            'amount'          => $params['amount'] ?? 100,
+            'mile_type'       => $params['mile_type'] ?? \Constant::MILE_ACCUMULATION,
+        ]);
+
+        if ($return === true) {
+            return $basicSetting;
         }
-        return self::$url;
+    }
+
+    /**
+     * mock api
+     *
+     * @return void
+     */
+    private function mockApi()
+    {
+        $bookingData  = json_decode(file_get_contents(base_path('tests/json/getBookingDetail.json')));
+        $activityData = json_decode(file_get_contents(base_path('tests/json/getActivityDetail.json')));
+
+        Api::shouldReceive('requestNoCache')
+            ->with('get-booking-details', ['booking_id' => 'VELTRA-123456'])
+            ->andThrow(new HttpException(404));
+        Api::shouldReceive('requestNoCache')
+            ->with('get-booking-details', \Mockery::any())
+            ->andReturn($bookingData);
+        Api::shouldReceive('request')
+            ->with('get-activity-details', \Mockery::any())
+            ->andReturn($activityData);
+
+        $this->bookingDetail  = $bookingData;
+        $this->activityDetail = $activityData;
+    }
+
+    /**
+     * create promotions for test
+     *
+     * @param integer $total
+     * @return void
+     */
+    private function createPromotions($total = 1)
+    {
+        for ($i = 1; $i <= $total; $i++) {
+            $asd = $i*24*60*60;
+            factory(Promotion::class)->create([
+                'activity_start_date' => date('Y-m-d', strtotime(date('Y-m-d')) + $asd),
+                'activity_end_date' => null,
+                'purchase_start_date' => date('Y-m-d', strtotime(date('Y-m-d')) + $asd + 3*24*60*60),
+                'purchase_end_date' => null,
+                'amount' => 100 + $i,
+                'mile_type' => self::$mileType
+            ]);
+        }
     }
 }
